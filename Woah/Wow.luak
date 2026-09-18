@@ -1,0 +1,763 @@
+-- OPEN BECAUSS ITS SHIT
+--- HTTP Spy users hi :/
+
+local function loaded()
+    if game.PlaceId ~= 107778070777162 then
+        return
+    end
+
+    local Players = game:GetService("Players")
+    local TweenService = game:GetService("TweenService")
+    local UserInputService = game:GetService("UserInputService")
+
+    local Player = Players.LocalPlayer
+
+    local VALID_KEY = "keyfixed2"
+    local SAVE_FILE = "monarch_key.txt"
+
+    local function loadingscreen()
+        local ScreenGui = Instance.new("ScreenGui")
+        ScreenGui.Name = "VignetteGui"
+        ScreenGui.IgnoreGuiInset = true
+        ScreenGui.ResetOnSpawn = false
+        ScreenGui.ZIndexBehavior = Enum.ZIndexBehavior.Global
+        ScreenGui.Parent = Player:WaitForChild("PlayerGui")
+
+        local SnowFolder = Instance.new("Folder")
+        SnowFolder.Name = "Snowflakes"
+        SnowFolder.Parent = ScreenGui
+
+        local Snowflakes = {}
+
+        local function createSnowflake()
+            if not ScreenGui.Parent then
+                return
+            end
+
+            local Snow = Instance.new("Frame")
+            local size = math.random(3, 7)
+
+            Snow.Size = UDim2.fromOffset(size, size)
+            Snow.Position = UDim2.fromScale(math.random(), -0.03)
+            Snow.AnchorPoint = Vector2.new(0.5, 0.5)
+            Snow.BackgroundColor3 = Color3.new(1, 1, 1)
+            Snow.BackgroundTransparency = 0.6
+            Snow.BorderSizePixel = 0
+            Snow.ZIndex = 1002
+            Snow.Parent = SnowFolder
+
+            local Corner = Instance.new("UICorner")
+            Corner.CornerRadius = UDim.new(1, 0)
+            Corner.Parent = Snow
+
+            table.insert(Snowflakes, Snow)
+
+            local duration = math.random(30, 50) / 10
+            local drift = math.random(-100, 100) / 1000
+            local startX = Snow.Position.X.Scale
+
+            local tween = TweenService:Create(
+                Snow,
+                TweenInfo.new(duration, Enum.EasingStyle.Linear),
+                {
+                    Position = UDim2.fromScale(startX + drift, 1.08)
+                }
+            )
+
+            tween.Completed:Connect(function()
+                for i, v in ipairs(Snowflakes) do
+                    if v == Snow then
+                        table.remove(Snowflakes, i)
+                        break
+                    end
+                end
+
+                if Snow then
+                    Snow:Destroy()
+                end
+            end)
+
+            tween:Play()
+        end
+
+        for i = 1, 45 do
+            task.delay(math.random() * 4, createSnowflake)
+        end
+
+        task.spawn(function()
+            while ScreenGui.Parent do
+                createSnowflake()
+                task.wait(0.08)
+            end
+        end)
+
+        local Dark = Instance.new("Frame")
+        Dark.Size = UDim2.fromScale(1, 1)
+        Dark.BackgroundColor3 = Color3.new(0, 0, 0)
+        Dark.BackgroundTransparency = 1
+        Dark.BorderSizePixel = 0
+        Dark.ZIndex = 998
+        Dark.Parent = ScreenGui
+
+        local Vignette = Instance.new("ImageLabel")
+        Vignette.BackgroundTransparency = 1
+        Vignette.Image = "rbxassetid://11202863894"
+        Vignette.AnchorPoint = Vector2.new(0.5, 0.5)
+        Vignette.Position = UDim2.fromScale(0.5, 0.5)
+        Vignette.Size = UDim2.fromScale(3, 3)
+        Vignette.ZIndex = 999
+        Vignette.ScaleType = Enum.ScaleType.Stretch
+        Vignette.Parent = ScreenGui
+
+        local Gradient = Instance.new("UIGradient")
+        Gradient.Color = ColorSequence.new({
+            ColorSequenceKeypoint.new(0, Color3.fromRGB(170, 70, 255)),
+            ColorSequenceKeypoint.new(1, Color3.fromRGB(40, 110, 255))
+        })
+        Gradient.Parent = Vignette
+
+        local TextHolder = Instance.new("Frame")
+        TextHolder.BackgroundTransparency = 1
+        TextHolder.AnchorPoint = Vector2.new(0.5, 0.5)
+        TextHolder.Position = UDim2.fromScale(0.5, 0.5)
+        TextHolder.Size = UDim2.fromScale(0.65, 0.25)
+        TextHolder.ZIndex = 1000
+        TextHolder.Parent = ScreenGui
+
+        local Text = "monarch.win"
+        local Letters = {}
+        local TextGradients = {}
+
+        local count = #Text
+        local letterWidth = 0.075
+        local gap = 0.002
+        local totalWidth = count * letterWidth + (count - 1) * gap
+        local startX = 0.5 - totalWidth / 2
+
+        for i = 1, count do
+            local Letter = Instance.new("TextLabel")
+            Letter.BackgroundTransparency = 1
+            Letter.Text = Text:sub(i, i)
+            Letter.TextColor3 = Color3.new(1, 1, 1)
+            Letter.TextTransparency = 0
+            Letter.TextStrokeTransparency = 0.5
+            Letter.TextScaled = true
+            Letter.Font = Enum.Font.GothamBold
+            Letter.AnchorPoint = Vector2.new(0.5, 0.5)
+            Letter.Size = UDim2.fromScale(letterWidth, 0.55)
+
+            local targetX = startX + letterWidth / 2 + (i - 1) * (letterWidth + gap)
+
+            Letter.Position = UDim2.fromScale(targetX, 0.5)
+            Letter.ZIndex = 1000
+            Letter.Parent = TextHolder
+
+            local TextGradient = Instance.new("UIGradient")
+            TextGradient.Color = ColorSequence.new({
+                ColorSequenceKeypoint.new(0, Color3.fromRGB(40, 130, 255)),
+                ColorSequenceKeypoint.new(0.5, Color3.fromRGB(100, 80, 255)),
+                ColorSequenceKeypoint.new(1, Color3.fromRGB(190, 60, 255))
+            })
+            TextGradient.Parent = Letter
+
+            table.insert(Letters, Letter)
+            table.insert(TextGradients, TextGradient)
+        end
+
+        local Subtitle = Instance.new("TextLabel")
+        Subtitle.BackgroundTransparency = 1
+        Subtitle.Text = "Created by Nobu"
+        Subtitle.TextColor3 = Color3.new(1, 1, 1)
+        Subtitle.TextTransparency = 0
+        Subtitle.TextStrokeTransparency = 0.7
+        Subtitle.TextScaled = true
+        Subtitle.Font = Enum.Font.Gotham
+        Subtitle.AnchorPoint = Vector2.new(0.5, 0)
+        Subtitle.Position = UDim2.fromScale(0.5, 0.56)
+        Subtitle.Size = UDim2.fromScale(0.4, 0.07)
+        Subtitle.ZIndex = 1001
+        Subtitle.Parent = ScreenGui
+
+        TweenService:Create(
+            Dark,
+            TweenInfo.new(1.5, Enum.EasingStyle.Quint, Enum.EasingDirection.Out),
+            {BackgroundTransparency = 0.4}
+        ):Play()
+
+        TweenService:Create(
+            Vignette,
+            TweenInfo.new(1.5, Enum.EasingStyle.Quint, Enum.EasingDirection.Out),
+            {Size = UDim2.fromScale(1.15, 1.15)}
+        ):Play()
+
+        TweenService:Create(
+            Gradient,
+            TweenInfo.new(0.5, Enum.EasingStyle.Linear, Enum.EasingDirection.In, -1),
+            {Rotation = 360}
+        ):Play()
+
+        for i, Letter in ipairs(Letters) do
+            local targetX = startX + letterWidth / 2 + (i - 1) * (letterWidth + gap)
+            local startY = i % 2 == 0 and -1.5 or 1.5
+
+            Letter.Position = UDim2.fromScale(targetX, startY)
+
+            task.delay((i - 1) * 0.12, function()
+                if not Letter.Parent then
+                    return
+                end
+
+                TweenService:Create(
+                    Letter,
+                    TweenInfo.new(0.65, Enum.EasingStyle.Back, Enum.EasingDirection.Out),
+                    {Position = UDim2.fromScale(targetX, 0.36)}
+                ):Play()
+
+                TweenService:Create(
+                    TextGradients[i],
+                    TweenInfo.new(0.5, Enum.EasingStyle.Linear, Enum.EasingDirection.In, -1),
+                    {Rotation = 360}
+                ):Play()
+            end)
+        end
+
+        task.wait(0.65 + (count - 1) * 0.12)
+        task.wait(2)
+
+        for _, Letter in ipairs(Letters) do
+            TweenService:Create(
+                Letter,
+                TweenInfo.new(0.5, Enum.EasingStyle.Quad, Enum.EasingDirection.In),
+                {
+                    TextTransparency = 1,
+                    TextStrokeTransparency = 1
+                }
+            ):Play()
+        end
+
+        TweenService:Create(
+            Subtitle,
+            TweenInfo.new(0.5, Enum.EasingStyle.Quad, Enum.EasingDirection.In),
+            {TextTransparency = 1}
+        ):Play()
+
+        TweenService:Create(
+            Dark,
+            TweenInfo.new(0.8, Enum.EasingStyle.Quad, Enum.EasingDirection.In),
+            {BackgroundTransparency = 1}
+        ):Play()
+
+        local Out = TweenService:Create(
+            Vignette,
+            TweenInfo.new(1, Enum.EasingStyle.Quint, Enum.EasingDirection.In),
+            {Size = UDim2.fromScale(3, 3)}
+        )
+
+        Out:Play()
+
+        for _, Snow in ipairs(Snowflakes) do
+            if Snow and Snow.Parent then
+                TweenService:Create(
+                    Snow,
+                    TweenInfo.new(0.8, Enum.EasingStyle.Quad, Enum.EasingDirection.In),
+                    {BackgroundTransparency = 1}
+                ):Play()
+            end
+        end
+
+        Out.Completed:Wait()
+
+        if ScreenGui then
+            ScreenGui:Destroy()
+        end
+    end
+
+    local function nights()
+        loadingscreen()
+        task.wait(4)
+
+        local Gui = Instance.new("ScreenGui")
+        Gui.Name = "MonarchPrompt"
+        Gui.IgnoreGuiInset = true
+        Gui.ResetOnSpawn = false
+        Gui.ZIndexBehavior = Enum.ZIndexBehavior.Global
+        Gui.Parent = Player:WaitForChild("PlayerGui")
+
+        local Main = Instance.new("Frame")
+        Main.Size = UDim2.fromOffset(460, 280)
+        Main.Position = UDim2.fromScale(0.5, 0.5)
+        Main.AnchorPoint = Vector2.new(0.5, 0.5)
+        Main.BackgroundColor3 = Color3.fromRGB(15, 15, 18)
+        Main.BorderSizePixel = 0
+        Main.Parent = Gui
+
+        local Corner = Instance.new("UICorner")
+        Corner.CornerRadius = UDim.new(0, 16)
+        Corner.Parent = Main
+
+        local Stroke = Instance.new("UIStroke")
+        Stroke.Color = Color3.fromRGB(55, 55, 62)
+        Stroke.Thickness = 1.2
+        Stroke.Transparency = 0.15
+        Stroke.Parent = Main
+
+        local MainGradient = Instance.new("UIGradient")
+        MainGradient.Color = ColorSequence.new({
+            ColorSequenceKeypoint.new(0, Color3.fromRGB(25, 25, 30)),
+            ColorSequenceKeypoint.new(1, Color3.fromRGB(11, 11, 14))
+        })
+        MainGradient.Rotation = 90
+        MainGradient.Parent = Main
+
+        local Top = Instance.new("Frame")
+        Top.Size = UDim2.new(1, 0, 0, 65)
+        Top.BackgroundTransparency = 1
+        Top.Parent = Main
+
+        local Title = Instance.new("TextLabel")
+        Title.Size = UDim2.new(1, -40, 0, 32)
+        Title.Position = UDim2.fromOffset(20, 13)
+        Title.BackgroundTransparency = 1
+        Title.Text = "Monarch"
+        Title.TextColor3 = Color3.fromRGB(245, 245, 245)
+        Title.TextSize = 24
+        Title.Font = Enum.Font.GothamBold
+        Title.TextXAlignment = Enum.TextXAlignment.Left
+        Title.Parent = Top
+
+        local Line = Instance.new("Frame")
+        Line.Size = UDim2.new(1, -40, 0, 1)
+        Line.Position = UDim2.fromOffset(20, 64)
+        Line.BackgroundColor3 = Color3.fromRGB(50, 50, 56)
+        Line.BorderSizePixel = 0
+        Line.Parent = Main
+
+        local Info = Instance.new("TextLabel")
+        Info.Size = UDim2.new(1, -50, 0, 65)
+        Info.Position = UDim2.fromOffset(25, 82)
+        Info.BackgroundTransparency = 1
+        Info.Text = "This script currently has only a few features.\nIf you have suggestions, please join our Discord and let us know!"
+        Info.TextColor3 = Color3.fromRGB(175, 175, 182)
+        Info.TextSize = 14
+        Info.Font = Enum.Font.Gotham
+        Info.TextWrapped = true
+        Info.TextXAlignment = Enum.TextXAlignment.Center
+        Info.TextYAlignment = Enum.TextYAlignment.Center
+        Info.Parent = Main
+
+        local function CreateButton(Text, Position)
+            local Button = Instance.new("TextButton")
+            Button.Size = UDim2.fromOffset(195, 48)
+            Button.Position = Position
+            Button.BackgroundColor3 = Color3.fromRGB(31, 31, 38)
+            Button.BorderSizePixel = 0
+            Button.Text = Text
+            Button.TextColor3 = Color3.fromRGB(235, 235, 240)
+            Button.TextSize = 14
+            Button.Font = Enum.Font.GothamSemibold
+            Button.AutoButtonColor = false
+            Button.Parent = Main
+
+            local C = Instance.new("UICorner")
+            C.CornerRadius = UDim.new(0, 10)
+            C.Parent = Button
+
+            local S = Instance.new("UIStroke")
+            S.Color = Color3.fromRGB(65, 65, 75)
+            S.Thickness = 1
+            S.Transparency = 0.15
+            S.Parent = Button
+
+            Button.MouseEnter:Connect(function()
+                TweenService:Create(
+                    Button,
+                    TweenInfo.new(0.15),
+                    {BackgroundColor3 = Color3.fromRGB(45, 45, 55)}
+                ):Play()
+            end)
+
+            Button.MouseLeave:Connect(function()
+                TweenService:Create(
+                    Button,
+                    TweenInfo.new(0.15),
+                    {BackgroundColor3 = Color3.fromRGB(31, 31, 38)}
+                ):Play()
+            end)
+
+            Button.MouseButton1Down:Connect(function()
+                TweenService:Create(
+                    Button,
+                    TweenInfo.new(0.08),
+                    {Size = UDim2.fromOffset(188, 45)}
+                ):Play()
+            end)
+
+            Button.MouseButton1Up:Connect(function()
+                TweenService:Create(
+                    Button,
+                    TweenInfo.new(0.08),
+                    {Size = UDim2.fromOffset(195, 48)}
+                ):Play()
+            end)
+
+            return Button
+        end
+
+        local Load = CreateButton(
+            "Load Script",
+            UDim2.new(0, 25, 1, -70)
+        )
+
+        local Know = CreateButton(
+            "I Already Know",
+            UDim2.new(1, -220, 1, -70)
+        )
+
+        local hasLoaded = false
+
+        local function LoadScript()
+            if hasLoaded then
+                return
+            end
+
+            hasLoaded = true
+
+            Gui:Destroy()
+
+            task.wait(1.5)
+
+            SCRIPT_KEY = "KEYLESS"
+
+            local success, result = pcall(function()
+                return loadstring(game:HttpGet(
+                    "https://api.jnkie.com/api/v1/luascripts/public/e0600b9803e7e83945190ad1daa24b565e5e695e89071a6b044f98ab512a39db/download"
+                ))()
+            end)
+
+            if not success then
+                warn("Monarch script failed to load:", result)
+            end
+        end
+
+        Load.MouseButton1Click:Connect(LoadScript)
+        Know.MouseButton1Click:Connect(LoadScript)
+
+        local Dragging = false
+        local DragStart
+        local StartPos
+
+        Top.InputBegan:Connect(function(Input)
+            if Input.UserInputType == Enum.UserInputType.MouseButton1
+            or Input.UserInputType == Enum.UserInputType.Touch then
+                Dragging = true
+                DragStart = Input.Position
+                StartPos = Main.Position
+            end
+        end)
+
+        Top.InputEnded:Connect(function(Input)
+            if Input.UserInputType == Enum.UserInputType.MouseButton1
+            or Input.UserInputType == Enum.UserInputType.Touch then
+                Dragging = false
+            end
+        end)
+
+        UserInputService.InputChanged:Connect(function(Input)
+            if not Dragging then
+                return
+            end
+
+            if Input.UserInputType == Enum.UserInputType.MouseMovement
+            or Input.UserInputType == Enum.UserInputType.Touch then
+                local Delta = Input.Position - DragStart
+
+                Main.Position = UDim2.new(
+                    StartPos.X.Scale,
+                    StartPos.X.Offset + Delta.X,
+                    StartPos.Y.Scale,
+                    StartPos.Y.Offset + Delta.Y
+                )
+            end
+        end)
+
+        Main.Size = UDim2.fromOffset(400, 240)
+        Main.BackgroundTransparency = 1
+
+        TweenService:Create(
+            Main,
+            TweenInfo.new(0.35, Enum.EasingStyle.Quint, Enum.EasingDirection.Out),
+            {
+                Size = UDim2.fromOffset(460, 280),
+                BackgroundTransparency = 0
+            }
+        ):Play()
+    end
+
+    local function savedKeyIsValid()
+        if not isfile(SAVE_FILE) then
+            return false
+        end
+
+        local success, savedKey = pcall(function()
+            return readfile(SAVE_FILE)
+        end)
+
+        if not success or type(savedKey) ~= "string" then
+            return false
+        end
+
+        return savedKey:gsub("%s+", "") == VALID_KEY
+    end
+
+    if savedKeyIsValid() then
+        nights()
+        return
+    end
+
+    local CoreGui = game:GetService("CoreGui")
+    local Existing = CoreGui:FindFirstChild("KeySystem")
+
+    if Existing then
+        Existing:Destroy()
+    end
+
+    local Gui = Instance.new("ScreenGui")
+    Gui.Name = "KeySystem"
+    Gui.IgnoreGuiInset = true
+    Gui.ResetOnSpawn = false
+    Gui.ZIndexBehavior = Enum.ZIndexBehavior.Global
+    Gui.Parent = CoreGui
+
+    local Main = Instance.new("Frame")
+    Main.Size = UDim2.fromOffset(340, 255)
+    Main.Position = UDim2.fromScale(0.5, 0.5)
+    Main.AnchorPoint = Vector2.new(0.5, 0.5)
+    Main.BackgroundColor3 = Color3.fromRGB(18, 18, 18)
+    Main.BorderSizePixel = 0
+    Main.Parent = Gui
+
+    local MainCorner = Instance.new("UICorner")
+    MainCorner.CornerRadius = UDim.new(0, 12)
+    MainCorner.Parent = Main
+
+    local MainStroke = Instance.new("UIStroke")
+    MainStroke.Color = Color3.fromRGB(55, 55, 55)
+    MainStroke.Thickness = 1
+    MainStroke.Parent = Main
+
+    local Notice = Instance.new("TextLabel")
+    Notice.Size = UDim2.new(1, -30, 0, 45)
+    Notice.Position = UDim2.fromOffset(15, 7)
+    Notice.BackgroundTransparency = 1
+    Notice.Text = "Key was added because the script is getting a whole new rework!\nThe key won't change during this period, so there's no need to redo it."
+    Notice.TextColor3 = Color3.fromRGB(145, 145, 145)
+    Notice.TextSize = 10
+    Notice.Font = Enum.Font.Gotham
+    Notice.TextWrapped = true
+    Notice.TextXAlignment = Enum.TextXAlignment.Left
+    Notice.TextYAlignment = Enum.TextYAlignment.Center
+    Notice.Parent = Main
+
+    local Title = Instance.new("TextLabel")
+    Title.Size = UDim2.new(1, -30, 0, 30)
+    Title.Position = UDim2.fromOffset(15, 49)
+    Title.BackgroundTransparency = 1
+    Title.Text = "Monarch Key System"
+    Title.TextColor3 = Color3.new(1, 1, 1)
+    Title.TextSize = 20
+    Title.Font = Enum.Font.GothamBold
+    Title.TextXAlignment = Enum.TextXAlignment.Left
+    Title.Parent = Main
+
+    local Box = Instance.new("TextBox")
+    Box.Size = UDim2.new(1, -30, 0, 42)
+    Box.Position = UDim2.fromOffset(15, 84)
+    Box.BackgroundColor3 = Color3.fromRGB(25, 25, 25)
+    Box.BorderSizePixel = 0
+    Box.PlaceholderText = "Enter your key..."
+    Box.PlaceholderColor3 = Color3.fromRGB(120, 120, 120)
+    Box.Text = ""
+    Box.TextColor3 = Color3.new(1, 1, 1)
+    Box.TextSize = 14
+    Box.Font = Enum.Font.Gotham
+    Box.ClearTextOnFocus = false
+    Box.Parent = Main
+
+    local BoxCorner = Instance.new("UICorner")
+    BoxCorner.CornerRadius = UDim.new(0, 8)
+    BoxCorner.Parent = Box
+
+    local BoxStroke = Instance.new("UIStroke")
+    BoxStroke.Color = Color3.fromRGB(55, 55, 55)
+    BoxStroke.Thickness = 1
+    BoxStroke.Parent = Box
+
+    local GetKey = Instance.new("TextButton")
+    GetKey.Size = UDim2.new(0.48, -18, 0, 40)
+    GetKey.Position = UDim2.fromOffset(15, 137)
+    GetKey.BackgroundColor3 = Color3.fromRGB(35, 35, 35)
+    GetKey.BorderSizePixel = 0
+    GetKey.Text = "Get Key"
+    GetKey.TextColor3 = Color3.new(1, 1, 1)
+    GetKey.TextSize = 14
+    GetKey.Font = Enum.Font.GothamBold
+    GetKey.AutoButtonColor = false
+    GetKey.Parent = Main
+
+    local GetCorner = Instance.new("UICorner")
+    GetCorner.CornerRadius = UDim.new(0, 8)
+    GetCorner.Parent = GetKey
+
+    local GetStroke = Instance.new("UIStroke")
+    GetStroke.Color = Color3.fromRGB(55, 55, 55)
+    GetStroke.Thickness = 1
+    GetStroke.Parent = GetKey
+
+    local Verify = Instance.new("TextButton")
+    Verify.Size = UDim2.new(0.52, -18, 0, 40)
+    Verify.Position = UDim2.new(0.48, 3, 0, 137)
+    Verify.BackgroundColor3 = Color3.fromRGB(134, 134, 2)
+    Verify.BorderSizePixel = 0
+    Verify.Text = "Verify Key"
+    Verify.TextColor3 = Color3.new(1, 1, 1)
+    Verify.TextSize = 14
+    Verify.Font = Enum.Font.GothamBold
+    Verify.AutoButtonColor = false
+    Verify.Parent = Main
+
+    local VerifyCorner = Instance.new("UICorner")
+    VerifyCorner.CornerRadius = UDim.new(0, 8)
+    VerifyCorner.Parent = Verify
+
+    local VerifyStroke = Instance.new("UIStroke")
+    VerifyStroke.Color = Color3.fromRGB(160, 160, 20)
+    VerifyStroke.Thickness = 1
+    VerifyStroke.Transparency = 0.25
+    VerifyStroke.Parent = Verify
+
+    local Status = Instance.new("TextLabel")
+    Status.Size = UDim2.new(1, -30, 0, 25)
+    Status.Position = UDim2.fromOffset(15, 188)
+    Status.BackgroundTransparency = 1
+    Status.Text = ""
+    Status.TextColor3 = Color3.fromRGB(160, 160, 160)
+    Status.TextSize = 12
+    Status.Font = Enum.Font.Gotham
+    Status.TextXAlignment = Enum.TextXAlignment.Center
+    Status.Parent = Main
+
+    GetKey.MouseEnter:Connect(function()
+        TweenService:Create(
+            GetKey,
+            TweenInfo.new(0.15),
+            {BackgroundColor3 = Color3.fromRGB(45, 45, 45)}
+        ):Play()
+    end)
+
+    GetKey.MouseLeave:Connect(function()
+        TweenService:Create(
+            GetKey,
+            TweenInfo.new(0.15),
+            {BackgroundColor3 = Color3.fromRGB(35, 35, 35)}
+        ):Play()
+    end)
+
+    Verify.MouseEnter:Connect(function()
+        TweenService:Create(
+            Verify,
+            TweenInfo.new(0.15),
+            {BackgroundColor3 = Color3.fromRGB(155, 155, 5)}
+        ):Play()
+    end)
+
+    Verify.MouseLeave:Connect(function()
+        TweenService:Create(
+            Verify,
+            TweenInfo.new(0.15),
+            {BackgroundColor3 = Color3.fromRGB(134, 134, 2)}
+        ):Play()
+    end)
+
+    GetKey.MouseButton1Click:Connect(function()
+        if setclipboard then
+            setclipboard("dsc.gg/monarchwin")
+            Status.Text = "Discord link copied!"
+        else
+            Status.Text = "Clipboard is unavailable."
+        end
+    end)
+
+    Verify.MouseButton1Click:Connect(function()
+        if Verify.Text == "Checking..." then
+            return
+        end
+
+        Verify.Text = "Checking..."
+        Status.Text = ""
+
+        local enteredKey = Box.Text:gsub("%s+", "")
+
+        if enteredKey == VALID_KEY then
+            local success = pcall(function()
+                writefile(SAVE_FILE, VALID_KEY)
+            end)
+
+            if not success then
+                Status.Text = "Could not save key."
+                Verify.Text = "Verify Key"
+                return
+            end
+
+            Status.Text = "Key verified!"
+            Verify.Text = "Verified!"
+
+            task.wait(0.4)
+
+            Gui:Destroy()
+            nights()
+        else
+            Status.Text = "Invalid key."
+            Verify.Text = "Verify Key"
+        end
+    end)
+
+    local Dragging = false
+    local DragStart
+    local StartPos
+
+    Main.InputBegan:Connect(function(Input)
+        if Input.UserInputType == Enum.UserInputType.MouseButton1
+        or Input.UserInputType == Enum.UserInputType.Touch then
+            Dragging = true
+            DragStart = Input.Position
+            StartPos = Main.Position
+        end
+    end)
+
+    Main.InputEnded:Connect(function(Input)
+        if Input.UserInputType == Enum.UserInputType.MouseButton1
+        or Input.UserInputType == Enum.UserInputType.Touch then
+            Dragging = false
+        end
+    end)
+
+    UserInputService.InputChanged:Connect(function(Input)
+        if not Dragging then
+            return
+        end
+
+        if Input.UserInputType == Enum.UserInputType.MouseMovement
+        or Input.UserInputType == Enum.UserInputType.Touch then
+            local Delta = Input.Position - DragStart
+
+            Main.Position = UDim2.new(
+                StartPos.X.Scale,
+                StartPos.X.Offset + Delta.X,
+                StartPos.Y.Scale,
+                StartPos.Y.Offset + Delta.Y
+            )
+        end
+    end)
+end
+
+loaded()
